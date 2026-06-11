@@ -57,8 +57,15 @@ npm run build
 - Amplify app id: `d21vwc9tx0yz7a` (us-east-1), branch `main`, default domain
   `d21vwc9tx0yz7a.amplifyapp.com`, custom domain `krefwatch.com` (Route 53, same account,
   hosted zone `Z0446155MTHAEGO3HCHM`; registered 2026-06-11, auto-renew on).
-- SPA rewrite rule is configured on the app (excludes json/md/txt/xml so `/data/*`,
-  `llms.txt`, `skill.md` serve directly).
+- **Amplify routing gotcha (cost an hour on launch day):** custom rules run BEFORE file
+  serving, and Amplify does NO directory-index resolution below root — so the standard
+  SPA regex rewrite hijacks every extensionless prerendered URL, and a bare `404-200`
+  still misses `/e/<date>/candidates/<slug>` (the file is `<slug>/index.html`). The app
+  therefore carries explicit placeholder rules mapping each prerendered route shape to
+  its `…/index.html` (donor/employer DETAIL routes → `/index.html` 200 first, since
+  they're SPA-only), with `/<*> → /index.html 404-200` last. If the prerenderer gains a
+  new route shape, add a matching rule via `aws amplify update-app --custom-rules`.
+- A missing rewrite target falls through gracefully (bad candidate slug → SPA shell).
 - Deploy: `./deploy/deploy.sh` (builds, zips dist, create-deployment → PUT zip →
   start-deployment).
 - **Paul handles deploys** unless he explicitly says otherwise.
