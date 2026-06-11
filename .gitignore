@@ -1,0 +1,12 @@
+
+.DS_Store
+*.local
+# dependencies / build
+# generated data stays out of git
+# misc
+data/raw/
+deploy/dist.zip
+dist/
+node_modules/
+npm-debug.log*
+public/data/
