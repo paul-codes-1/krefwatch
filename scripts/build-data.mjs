@@ -171,14 +171,21 @@ function processElection(dateKey, csvPath) {
     const last = get(row, 'Contributor Last Name');
     const personName = buildFullName(first, last);
     const contributorName = personName || orgName;
-    const identityKey = buildIdentityKey({
-      hasName: Boolean(personName),
-      hasOrg: Boolean(orgName),
-      contributorFullName: contributorName,
-      contributionType,
-      recipientKey: cand.slug,
-      index: idx,
-    });
+    // Candidates frequently give/loan to their own campaigns under their own
+    // name (types CANDIDATE, OTHER, INDIVIDUAL). Those are self-funding, not
+    // donors — fold them into the candidate-self key so they never surface in
+    // named-donor rankings.
+    const isNamedSelf = Boolean(personName) && slugify(personName) === slugify(recipName);
+    const identityKey = isNamedSelf
+      ? `candidate-self-${cand.slug}`
+      : buildIdentityKey({
+          hasName: Boolean(personName),
+          hasOrg: Boolean(orgName),
+          contributorFullName: contributorName,
+          contributionType,
+          recipientKey: cand.slug,
+          index: idx,
+        });
 
     const city = get(row, 'City');
     const state = get(row, 'State');
@@ -218,7 +225,9 @@ function processElection(dateKey, csvPath) {
     if (!donor) {
       donor = {
         key: identityKey,
-        name: contributorName || (contributionType === 'CANDIDATE' ? `${recipName} (self)` : contributionType === 'UNITEMIZED' ? `Unitemized — ${recipName}` : contributionType || 'Unnamed'),
+        name: isNamedSelf || contributionType === 'CANDIDATE'
+          ? `${recipName} (self)`
+          : contributorName || (contributionType === 'UNITEMIZED' ? `Unitemized — ${recipName}` : contributionType || 'Unnamed'),
         city,
         state,
         employer: employerRaw,
