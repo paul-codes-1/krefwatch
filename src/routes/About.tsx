@@ -72,8 +72,13 @@ export default function About() {
 
         <h2>For AI agents &amp; developers</h2>
         <p>
-          There is no backend — the open JSON under <code>/data/</code> is the whole machine-readable
-          API. It's static, CORS-open, no auth, no key:
+          The entire site is{' '}
+          <a href="https://github.com/paul-codes-1/krefwatch" rel="noopener">
+            open source on GitHub
+          </a>{' '}
+          — data pipeline, frontend, and deploy scripts. There is no backend — the open JSON under{' '}
+          <code>/data/</code> is the whole machine-readable API. It's static, CORS-open, no auth, no
+          key:
         </p>
         <ul>
           <li>

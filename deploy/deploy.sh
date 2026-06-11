@@ -11,6 +11,8 @@ ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 echo "==> Building"
 cd "$ROOT"
 npm run build
+echo "==> Prerendering SEO pages"
+node scripts/prerender.mjs
 
 echo "==> Zipping dist/"
 ZIP="$ROOT/deploy/dist.zip"

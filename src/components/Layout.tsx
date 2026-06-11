@@ -106,7 +106,10 @@ export default function Layout() {
           </p>
           <p className="footer-meta">
             For AI agents: <a href="/llms.txt">llms.txt</a> · <a href="/skill.md">skill.md</a> ·{' '}
-            <a href="/data/elections.json">JSON data</a>
+            <a href="/data/elections.json">JSON data</a> ·{' '}
+            <a href="https://github.com/paul-codes-1/krefwatch" rel="noopener">
+              Open source on GitHub
+            </a>
           </p>
         </div>
       </footer>

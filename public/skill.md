@@ -42,4 +42,5 @@ r=receipt date (M/D/YYYY), k=in-kind description.
 Data is exported per-election from KREF's public search portal, normalized (donor identity
 grouping, employer canonicalization), and rebuilt periodically. KREF Watch is an independent
 project of The Lexington Times (https://lexingtonky.news) and is not affiliated with the
-Kentucky Registry of Election Finance. Contact: editor@lexingtonky.news
+Kentucky Registry of Election Finance. Fully open source:
+https://github.com/paul-codes-1/krefwatch · Contact: editor@lexingtonky.news

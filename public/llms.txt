@@ -40,6 +40,10 @@ Donor keys prefixed `candidate-self-`, `unitemized-`, `anonymous-`, `cash-unname
   (https://secure.kentucky.gov/kref/publicsearch) before publication.
 - Federal races (US House/Senate/President) are NOT here — that's FEC data, not KREF.
 
+## Source code
+
+Fully open source (pipeline + frontend): https://github.com/paul-codes-1/krefwatch
+
 ## Contact
 
 editor@lexingtonky.news · The Lexington Times · https://lexingtonky.news
