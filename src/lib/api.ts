@@ -60,3 +60,21 @@ export const getEmployers = (date: string): Promise<EmployerRollup[]> =>
 
 export const getCandidate = (date: string, slug: string): Promise<CandidateFile> =>
   cachedFetch(candidateCache, `${date}/${slug}`, `${DATA_BASE}/e/${date}/candidates/${slug}.json`);
+
+/** klec-links.json: employer key -> the klecwatch.com year where its lobbying total is largest. */
+export interface KlecLink {
+  year: number;
+  total: number;
+}
+let klecLinksPromise: Promise<Record<string, KlecLink>> | null = null;
+export function getKlecLinks(): Promise<Record<string, KlecLink>> {
+  if (!klecLinksPromise) {
+    klecLinksPromise = fetchJson<Record<string, KlecLink>>(`${DATA_BASE}/klec-links.json`).catch(
+      (err: unknown) => {
+        klecLinksPromise = null;
+        throw err;
+      },
+    );
+  }
+  return klecLinksPromise;
+}

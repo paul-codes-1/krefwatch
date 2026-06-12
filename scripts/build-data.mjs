@@ -432,3 +432,33 @@ writeJson(path.join(OUT_DIR, 'elections.json'), {
   elections: index,
 });
 console.log(`\nWrote ${index.length} elections to ${OUT_DIR}`);
+
+// ---------- cross-link to KLEC Watch (sibling repo, same machine) ----------
+// klec-links.json: employer key -> the klecwatch year where that organization's
+// lobbying total is largest. SPA links employer pages to
+// https://klecwatch.com/y/<year>/employers/<slugified-key>.
+try {
+  const KLEC = path.join(OUT_DIR, '..', '..', '..', 'klec-tracker', 'public', 'data', 'y');
+  const bestL = new Map();
+  for (const year of fs.readdirSync(KLEC)) {
+    const f = path.join(KLEC, year, 'employers.json');
+    if (!fs.existsSync(f)) continue;
+    for (const e of JSON.parse(fs.readFileSync(f, 'utf8'))) {
+      const cur = bestL.get(e.key);
+      if (!cur || e.total > cur.total) bestL.set(e.key, { year: Number(year), total: e.total });
+    }
+  }
+  // restrict to keys that exist anywhere in this site's employer data
+  const ourKeys = new Set();
+  for (const date of fs.readdirSync(path.join(OUT_DIR, 'e'))) {
+    const f = path.join(OUT_DIR, 'e', date, 'employers.json');
+    if (!fs.existsSync(f)) continue;
+    for (const e of JSON.parse(fs.readFileSync(f, 'utf8'))) ourKeys.add(e.key);
+  }
+  const overlap = {};
+  for (const [k, v] of bestL) if (ourKeys.has(k)) overlap[k] = v;
+  writeJson(path.join(OUT_DIR, 'klec-links.json'), overlap);
+  console.log(`klec-links.json: ${Object.keys(overlap).length} cross-linked employers`);
+} catch (err) {
+  console.warn('klec cross-link skipped:', err.message);
+}

@@ -102,7 +102,10 @@ export default function Layout() {
           </p>
           <p className="footer-meta">
             Data generated {formatLongDate(index.generatedAt.slice(0, 10))} ·{' '}
-            <Link to="/about">Methodology &amp; caveats</Link>
+            <Link to="/about">Methodology &amp; caveats</Link> · Lobbying:{' '}
+            <a href="https://klecwatch.com" rel="noopener">
+              KLEC Watch — who lobbies Frankfort
+            </a>
           </p>
           <p className="footer-meta">
             For AI agents: <a href="/llms.txt">llms.txt</a> · <a href="/skill.md">skill.md</a> ·{' '}

@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { getDonors, getEmployers } from '../lib/api';
+import { getDonors, getEmployers, getKlecLinks } from '../lib/api';
 import { useData } from '../hooks/useData';
 import { useElectionParam } from '../hooks/useElectionParam';
 import { slugify } from '../lib/utils';
@@ -17,6 +17,7 @@ export default function EmployerDetail() {
   const { employerSlug = '' } = useParams<{ employerSlug: string }>();
   const employersState = useData(() => getEmployers(date), `employers:${date}`);
   const donorsState = useData(() => getDonors(date), `donors:${date}`);
+  const klecLinksState = useData(() => getKlecLinks(), 'klec-links');
 
   const employer = useMemo(
     () => employersState.data?.find((e) => slugify(e.key) === employerSlug) ?? null,
@@ -125,6 +126,23 @@ export default function EmployerDetail() {
           <span className="kpi-value">{formatCount(employer.count)}</span>
         </div>
       </div>
+
+      {klecLinksState.data?.[employer.key] && (
+        <aside className="cross-site-card">
+          <span className="cross-site-kicker">Frankfort lobbying</span>
+          <p>
+            {employer.name} also lobbies the Kentucky General Assembly —{' '}
+            {formatMoney(klecLinksState.data[employer.key]!.total)} in reported lobbying spending in{' '}
+            {klecLinksState.data[employer.key]!.year}.{' '}
+            <a
+              href={`https://klecwatch.com/y/${klecLinksState.data[employer.key]!.year}/employers/${slugify(employer.key)}`}
+              rel="noopener"
+            >
+              See its lobbying record on KLEC Watch →
+            </a>
+          </p>
+        </aside>
+      )}
 
       <section className="section">
         <div className="section-head">
