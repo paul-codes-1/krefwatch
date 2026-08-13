@@ -15,6 +15,7 @@ import {
 import { usePageMeta } from '../hooks/usePageMeta';
 import { slugify } from '../lib/utils';
 import Money from '../components/Money';
+import AdSlot from '../components/AdSlot';
 import DataTable, { type Column } from '../components/DataTable';
 import MonthlyChart from '../components/MonthlyChart';
 import ShareBar from '../components/ShareBar';
@@ -258,6 +259,8 @@ export default function Overview() {
           rowKey={(r) => r.slug}
         />
       </section>
+
+      <AdSlot slot="9220305468" />
 
       <section className="section">
         <div className="section-head">

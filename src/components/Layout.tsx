@@ -2,6 +2,7 @@ import type { ChangeEvent } from 'react';
 import { Link, NavLink, Outlet, matchPath, useLocation, useNavigate } from 'react-router-dom';
 import { useElections } from '../context/ElectionsContext';
 import { formatElectionLabel, formatLongDate } from '../lib/format';
+import AdSlot from './AdSlot';
 
 /**
  * Where to land when switching elections, preserving the current view type.
@@ -91,6 +92,9 @@ export default function Layout() {
 
       <main>
         <Outlet />
+        <div className="container">
+          <AdSlot slot="2219782843" />
+        </div>
       </main>
 
       <footer className="site-footer">
