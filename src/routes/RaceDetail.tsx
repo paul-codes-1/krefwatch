@@ -8,6 +8,7 @@ import Money from '../components/Money';
 import ShareBar from '../components/ShareBar';
 import DataTable, { type Column } from '../components/DataTable';
 import UnknownElection from '../components/UnknownElection';
+import AdSlot from '../components/AdSlot';
 import { LoadingNote, ErrorNote } from '../components/Status';
 import type { RaceCandidate } from '../lib/types';
 
@@ -110,6 +111,8 @@ export default function RaceDetail() {
           <span className="kpi-value">{formatCount(race.candidates.length)}</span>
         </div>
       </div>
+
+      <AdSlot key={race.slug} slot="9220305468" />
 
       <section className="section">
         <div className="section-head">

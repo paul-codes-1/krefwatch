@@ -93,7 +93,9 @@ export default function Layout() {
       <main>
         <Outlet />
         <div className="container">
-          <AdSlot slot="2219782843" />
+          {/* key: re-request the ad on SPA navigation so each virtual pageview
+              gets a fresh impression (the <ins> can only be pushed once). */}
+          <AdSlot key={location.pathname} slot="2219782843" />
         </div>
       </main>
 

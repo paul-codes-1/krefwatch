@@ -24,6 +24,7 @@ import DataTable, { type Column } from '../components/DataTable';
 import SearchBox from '../components/SearchBox';
 import Pagination from '../components/Pagination';
 import UnknownElection from '../components/UnknownElection';
+import AdSlot from '../components/AdSlot';
 import { LoadingNote, ErrorNote, EmptyNote } from '../components/Status';
 import type { Contribution } from '../lib/types';
 
@@ -207,6 +208,8 @@ export default function CandidatePage() {
           </span>
         </div>
       </div>
+
+      <AdSlot key={slug} slot="9220305468" />
 
       <section className="section">
         <div className="section-head">
