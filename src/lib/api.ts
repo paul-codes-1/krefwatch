@@ -1,4 +1,4 @@
-import type { CandidateFile, Donor, ElectionsIndex, ElectionSummary, EmployerRollup, Race } from './types';
+import type { CandidateFile, Donor, DonorLite, ElectionsIndex, ElectionSummary, EmployerRollup, Race } from './types';
 
 const DATA_BASE = `${import.meta.env.BASE_URL}data`;
 
@@ -30,9 +30,19 @@ function cachedFetch<T>(cache: Map<string, Promise<T>>, key: string, path: strin
 let electionsPromise: Promise<ElectionsIndex> | null = null;
 const summaryCache = new Map<string, Promise<ElectionSummary>>();
 const racesCache = new Map<string, Promise<Race[]>>();
-const donorsCache = new Map<string, Promise<Donor[]>>();
+const donorsLiteCache = new Map<string, Promise<DonorLite[]>>();
+const donorShardCache = new Map<string, Promise<Donor[]>>();
 const employersCache = new Map<string, Promise<EmployerRollup[]>>();
 const candidateCache = new Map<string, Promise<CandidateFile>>();
+
+// Donor shard assignment — MUST stay in sync with donorShard() in
+// scripts/build-data.mjs (djb2 over the donor key, mod DONOR_SHARDS).
+const DONOR_SHARDS = 64;
+function donorShard(key: string): number {
+  let h = 5381;
+  for (let i = 0; i < key.length; i++) h = ((h * 33) ^ key.charCodeAt(i)) >>> 0;
+  return h % DONOR_SHARDS;
+}
 
 export function getElections(): Promise<ElectionsIndex> {
   if (!electionsPromise) {
@@ -50,9 +60,20 @@ export const getSummary = (date: string): Promise<ElectionSummary> =>
 export const getRaces = (date: string): Promise<Race[]> =>
   cachedFetch(racesCache, date, `${DATA_BASE}/e/${date}/races.json`);
 
-/** Big file (multi-MB on large elections) — only call from donor/employer views. */
-export const getDonors = (date: string): Promise<Donor[]> =>
-  cachedFetch(donorsCache, date, `${DATA_BASE}/e/${date}/donors.json`);
+/**
+ * Slim donor corpus (no recipients arrays) for search + employer pages.
+ * The full donors.json stays published as the open-data API but the SPA
+ * never loads it — Googlebot re-fetching it per rendered page was the
+ * bulk of the site's bandwidth bill (Aug 2026).
+ */
+export const getDonorsLite = (date: string): Promise<DonorLite[]> =>
+  cachedFetch(donorsLiteCache, date, `${DATA_BASE}/e/${date}/donors-lite.json`);
+
+/** The hash shard containing one donor's full record (with recipients). */
+export const getDonorShardFor = (date: string, key: string): Promise<Donor[]> => {
+  const n = donorShard(key);
+  return cachedFetch(donorShardCache, `${date}/${n}`, `${DATA_BASE}/e/${date}/donors/shard-${n}.json`);
+};
 
 /** Pipeline-generated employer rollup — the single source of truth for employer grouping. */
 export const getEmployers = (date: string): Promise<EmployerRollup[]> =>

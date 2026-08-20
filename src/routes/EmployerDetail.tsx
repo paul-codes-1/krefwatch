@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { getDonors, getEmployers, getKlecLinks } from '../lib/api';
+import { getDonorsLite, getEmployers, getKlecLinks } from '../lib/api';
 import { useData } from '../hooks/useData';
 import { useElectionParam } from '../hooks/useElectionParam';
 import { slugify } from '../lib/utils';
@@ -10,13 +10,13 @@ import Money from '../components/Money';
 import DataTable, { type Column } from '../components/DataTable';
 import UnknownElection from '../components/UnknownElection';
 import { LoadingNote, ErrorNote } from '../components/Status';
-import type { Donor } from '../lib/types';
+import type { DonorLite } from '../lib/types';
 
 export default function EmployerDetail() {
   const { date, election } = useElectionParam();
   const { employerSlug = '' } = useParams<{ employerSlug: string }>();
   const employersState = useData(() => getEmployers(date), `employers:${date}`);
-  const donorsState = useData(() => getDonors(date), `donors:${date}`);
+  const donorsState = useData(() => getDonorsLite(date), `donors-lite:${date}`);
   const klecLinksState = useData(() => getKlecLinks(), 'klec-links');
 
   const employer = useMemo(
@@ -75,7 +75,7 @@ export default function EmployerDetail() {
     );
   }
 
-  const columns: Column<Donor>[] = [
+  const columns: Column<DonorLite>[] = [
     {
       key: 'name',
       label: 'Donor',
@@ -96,7 +96,7 @@ export default function EmployerDetail() {
       key: 'recipients',
       label: 'Recipients',
       align: 'right',
-      render: (r) => <span className="num">{formatCount(r.recipients.length)}</span>,
+      render: (r) => <span className="num">{formatCount(r.recipientCount)}</span>,
     },
     { key: 'total', label: 'Given', align: 'right', highlight: true, render: (r) => <Money value={r.total} /> },
   ];

@@ -137,6 +137,12 @@ export interface Donor {
   recipients: DonorRecipient[];
 }
 
+/**
+ * Entry shape of e/<date>/donors-lite.json — donors.json minus the recipients
+ * arrays, so the search/employer pages don't pull the multi-MB full corpus.
+ */
+export type DonorLite = Omit<Donor, 'recipients'> & { recipientCount: number };
+
 /** Compact per-contribution record inside candidate shards. */
 export interface Contribution {
   /** donor identity key */

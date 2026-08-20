@@ -12,7 +12,7 @@ full data contract.
 | Valid election keys | `/data/elections.json` — keys are `YYYY-MM-DD` (e.g. `2026-05-19` = May 2026 primary) |
 | "Who raised the most in X election?" | `/data/e/<date>/summary.json` → `topCandidates` |
 | "How much has <candidate> raised?" | `/data/candidates-index.json` (find slug + election) → `/data/e/<date>/candidates/<slug>.json` |
-| "What has <person/company> donated?" | `/data/e/<date>/donors.json` — filter by name/city/employer |
+| "What has <person/company> donated?" | `/data/e/<date>/donors-lite.json` — filter by name/city/employer (full per-recipient detail: `donors/shard-<djb2(key) mod 64>.json` or the big `donors.json`) |
 | "Which employers' people gave the most?" | `/data/e/<date>/employers.json` |
 | "Which races are there / how competitive financially?" | `/data/e/<date>/races.json` |
 | Self-funding / small-dollar totals | `summary.json` → `selfFundingTotal`, `unitemizedTotal`, `topSelfFunders` |

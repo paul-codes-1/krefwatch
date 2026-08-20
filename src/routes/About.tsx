@@ -92,7 +92,9 @@ export default function About() {
           <li>
             <code>/data/e/&lt;date&gt;/races.json</code>, <code>donors.json</code>,{' '}
             <code>employers.json</code> — full per-election rollups (donors.json is large, up to
-            ~6&nbsp;MB).
+            ~13&nbsp;MB; <code>donors-lite.json</code> is the same list without per-recipient
+            breakdowns, and <code>donors/shard-&lt;0–63&gt;.json</code> splits the full records
+            into small hash shards).
           </li>
           <li>
             <code>/data/e/&lt;date&gt;/candidates/&lt;slug&gt;.json</code> — full itemized

@@ -14,14 +14,16 @@ All site data is plain JSON under `https://krefwatch.com/data/`:
 - `/data/candidates-index.json` — every candidate across all elections (name, slug, office, location, total). Use this to find a candidate's slug + election date.
 - `/data/e/<date>/summary.json` — KPIs, topCandidates, topDonors (named donors only), topSelfFunders, topEmployers, byOffice, byContributionType, monthly series, selfFundingTotal, unitemizedTotal.
 - `/data/e/<date>/races.json` — every race (office + location) with per-candidate totals.
-- `/data/e/<date>/donors.json` — per-donor aggregates with per-recipient breakdown (large file, up to ~6 MB).
+- `/data/e/<date>/donors.json` — per-donor aggregates with per-recipient breakdown (large file, up to ~13 MB).
+- `/data/e/<date>/donors-lite.json` — same list, same order, minus the recipients arrays (adds recipientCount). Much smaller; prefer it for search/rollup questions.
+- `/data/e/<date>/donors/shard-<n>.json` — full donor records split into 64 hash shards (n = djb2(key) mod 64). Fetch one shard instead of donors.json when you already know the donor key.
 - `/data/e/<date>/employers.json` — employer-normalized rollup (canonical aliases merge "UK"/"University of Kentucky", "Commonwealth of Ky" variants, law-firm suffixes, etc.).
 - `/data/e/<date>/candidates/<slug>.json` — full itemized contributions for one candidate. Row fields: d=donor key, n=name, a=amount, t=type, m=mode, c=city, s=state, z=zip, e=employer, o=occupation, r=receipt date, k=in-kind description.
 
 Typical flows:
 - "Who raised the most in X election?" → `/data/e/<date>/summary.json` → `topCandidates`
 - "How much has <candidate> raised?" → `/data/candidates-index.json` (find slug+date) → `/data/e/<date>/candidates/<slug>.json`
-- "What has <person/company> donated?" → `/data/e/<date>/donors.json`, filter client-side
+- "What has <person/company> donated?" → `/data/e/<date>/donors-lite.json` to find the donor key, then `/data/e/<date>/donors/shard-<djb2(key) mod 64>.json` for the per-recipient breakdown (or `/data/e/<date>/donors.json` if you want everything at once)
 - "Which employers' people gave the most?" → `/data/e/<date>/employers.json`
 
 Donor keys prefixed `candidate-self-`, `unitemized-`, `anonymous-`, `cash-unnamed-`, `unnamed-` are synthetic (self-funding, small-dollar bundles, unnamed cash) — not named people.

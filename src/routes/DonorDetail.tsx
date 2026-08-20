@@ -1,5 +1,5 @@
 import { Link, useParams } from 'react-router-dom';
-import { getDonors } from '../lib/api';
+import { getDonorShardFor } from '../lib/api';
 import { useData } from '../hooks/useData';
 import { useElectionParam } from '../hooks/useElectionParam';
 import {
@@ -22,7 +22,10 @@ import type { DonorRecipient } from '../lib/types';
 export default function DonorDetail() {
   const { date, election } = useElectionParam();
   const { key = '' } = useParams<{ key: string }>();
-  const { data: donors, loading, error } = useData(() => getDonors(date), `donors:${date}`);
+  const { data: donors, loading, error } = useData(
+    () => getDonorShardFor(date, key),
+    `donor-shard:${date}:${key}`,
+  );
 
   const found = donors?.find((d) => d.key === key);
   const shortLabel = election ? electionShortLabel(date, election.electionType) : '';

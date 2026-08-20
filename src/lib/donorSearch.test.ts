@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { filterDonors, EMPTY_QUERY_LIMIT } from './donorSearch';
-import type { Donor } from './types';
+import type { DonorLite } from './types';
 
-const donor = (overrides: Partial<Donor>): Donor => ({
+const donor = (overrides: Partial<DonorLite>): DonorLite => ({
   key: 'jane-doe',
   name: 'Jane Doe',
   city: 'Lexington',
@@ -12,11 +12,11 @@ const donor = (overrides: Partial<Donor>): Donor => ({
   occupation: 'Professor',
   total: 100,
   count: 1,
-  recipients: [],
+  recipientCount: 0,
   ...overrides,
 });
 
-const donors: Donor[] = [
+const donors: DonorLite[] = [
   donor({ key: 'jane-doe', name: 'Jane Doe', total: 5000 }),
   donor({
     key: 'candidate-self-bob-mayor',

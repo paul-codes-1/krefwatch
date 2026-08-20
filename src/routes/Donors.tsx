@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { getDonors } from '../lib/api';
+import { getDonorsLite } from '../lib/api';
 import { useData } from '../hooks/useData';
 import { useElectionParam } from '../hooks/useElectionParam';
 import { useDebounced } from '../hooks/useDebounced';
@@ -14,11 +14,11 @@ import DataTable, { type Column } from '../components/DataTable';
 import SearchBox from '../components/SearchBox';
 import UnknownElection from '../components/UnknownElection';
 import { LoadingNote, ErrorNote, EmptyNote } from '../components/Status';
-import type { Donor } from '../lib/types';
+import type { DonorLite } from '../lib/types';
 
 export default function Donors() {
   const { date, election } = useElectionParam();
-  const { data: donors, loading, error } = useData(() => getDonors(date), `donors:${date}`);
+  const { data: donors, loading, error } = useData(() => getDonorsLite(date), `donors-lite:${date}`);
   const [query, setQuery] = useState('');
   const [includeSynthetic, setIncludeSynthetic] = useState(false);
   const debouncedQuery = useDebounced(query);
@@ -39,7 +39,7 @@ export default function Donors() {
   const base = `/e/${date}`;
   const hasQuery = debouncedQuery.trim().length > 0;
 
-  const columns: Column<Donor>[] = [
+  const columns: Column<DonorLite>[] = [
     {
       key: 'name',
       label: 'Donor',
@@ -66,7 +66,7 @@ export default function Donors() {
       key: 'recipients',
       label: 'Recipients',
       align: 'right',
-      render: (r) => <span className="num">{formatCount(r.recipients.length)}</span>,
+      render: (r) => <span className="num">{formatCount(r.recipientCount)}</span>,
     },
     {
       key: 'count',
@@ -87,7 +87,7 @@ export default function Donors() {
       </p>
 
       <section className="section">
-        {loading && <LoadingNote label="Loading the full donor file — this can run a few megabytes…" />}
+        {loading && <LoadingNote label="Loading donor records…" />}
         {error && <ErrorNote message={error} />}
         {donors && (
           <>

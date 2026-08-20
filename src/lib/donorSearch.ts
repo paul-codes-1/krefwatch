@@ -1,4 +1,4 @@
-import type { Donor } from './types';
+import type { DonorLite } from './types';
 import { isSyntheticKey } from './synthetic';
 
 export const EMPTY_QUERY_LIMIT = 100;
@@ -14,7 +14,7 @@ export const RESULT_LIMIT = 200;
  * anonymous/unnamed cash) are excluded unless `includeSynthetic` is true.
  * Non-empty searches always match synthetics so they stay findable.
  */
-export function filterDonors(donors: Donor[], query: string, includeSynthetic = false): Donor[] {
+export function filterDonors(donors: DonorLite[], query: string, includeSynthetic = false): DonorLite[] {
   const q = query.trim().toLowerCase();
   if (!q) {
     const pool = includeSynthetic ? donors : donors.filter((d) => !isSyntheticKey(d.key));
@@ -22,7 +22,7 @@ export function filterDonors(donors: Donor[], query: string, includeSynthetic = 
   }
 
   const terms = q.split(/\s+/);
-  const results: Donor[] = [];
+  const results: DonorLite[] = [];
   for (const donor of donors) {
     const haystack =
       `${donor.name} ${donor.city} ${donor.state} ${donor.employer} ${donor.occupation}`.toLowerCase();

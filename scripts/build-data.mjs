@@ -5,7 +5,9 @@
 //   public/data/elections.json                  — index of all elections
 //   public/data/e/<date>/summary.json           — KPIs, top lists, rollups, monthly series
 //   public/data/e/<date>/races.json             — every race with per-candidate totals
-//   public/data/e/<date>/donors.json            — per-donor aggregates (search corpus)
+//   public/data/e/<date>/donors.json            — per-donor aggregates (open-data API; the SPA no longer loads it)
+//   public/data/e/<date>/donors-lite.json       — donors.json minus recipients arrays (SPA search corpus)
+//   public/data/e/<date>/donors/shard-<n>.json  — full donor records sharded by key hash (SPA donor pages)
 //   public/data/e/<date>/candidates/<slug>.json — full contribution rows per candidate
 //
 // All output is compact JSON; Amplify/CloudFront compression handles the wire size.
@@ -106,6 +108,16 @@ const writeJson = (file, obj) => {
 };
 
 const round2 = (n) => Math.round(n * 100) / 100;
+
+// Donor shard assignment — MUST stay in sync with donorShard() in src/lib/api.ts.
+// djb2 over the donor key, mod DONOR_SHARDS. Keeps every donors/shard-<n>.json
+// well under CloudFront's ~10 MB compression ceiling (the whole point of sharding).
+const DONOR_SHARDS = 64;
+const donorShard = (key) => {
+  let h = 5381;
+  for (let i = 0; i < key.length; i++) h = ((h * 33) ^ key.charCodeAt(i)) >>> 0;
+  return h % DONOR_SHARDS;
+};
 
 // ---------- per-election processing ----------
 function processElection(dateKey, csvPath) {
@@ -323,6 +335,21 @@ function processElection(dateKey, csvPath) {
         .sort((a, b) => b.total - a.total),
     }));
   writeJson(path.join(eDir, 'donors.json'), donorList);
+
+  // donors-lite.json — same order, recipients arrays dropped (the SPA search page
+  // and employer pages only need counts). Keeps the render-path payload small.
+  writeJson(
+    path.join(eDir, 'donors-lite.json'),
+    donorList.map(({ recipients, ...d }) => ({ ...d, recipientCount: recipients.length })),
+  );
+
+  // donors/shard-<n>.json — full records for the donor-detail page, keyed by hash
+  // so one donor page fetches ~1/64th of the corpus instead of all of it.
+  const shards = Array.from({ length: DONOR_SHARDS }, () => []);
+  for (const d of donorList) shards[donorShard(d.key)].push(d);
+  for (let n = 0; n < DONOR_SHARDS; n++) {
+    writeJson(path.join(eDir, 'donors', `shard-${n}.json`), shards[n]);
+  }
 
   // employers.json — canonical display = alias form or most common raw variant.
   // donorCount counts donors whose canonical employerKey is this employer (matching
