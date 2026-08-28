@@ -11,10 +11,14 @@ declare global {
  * Guard on data-adsbygoogle-status so a remount never double-pushes the
  * same <ins> (AdSense throws on that).
  */
+/** Flip to re-enable ads (also restore the adsbygoogle loader in index.html). */
+const ADS_ENABLED = false;
+
 export default function AdSlot({ slot }: { slot: string }) {
   const ref = useRef<HTMLModElement>(null);
 
   useEffect(() => {
+    if (!ADS_ENABLED) return;
     const ins = ref.current;
     if (!ins || ins.dataset.adsbygoogleStatus === 'done') return;
     try {
@@ -23,6 +27,8 @@ export default function AdSlot({ slot }: { slot: string }) {
       // loader blocked or absent — leave the slot empty
     }
   }, []);
+
+  if (!ADS_ENABLED) return null;
 
   return (
     <div className="ad-slot">
