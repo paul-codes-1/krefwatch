@@ -2,8 +2,15 @@ import type { CandidateFile, Donor, DonorLite, ElectionsIndex, ElectionSummary, 
 
 const DATA_BASE = `${import.meta.env.BASE_URL}data`;
 
+// Build-time constant (vite.config.ts `define`). Appended to every data URL so
+// each deploy's bundle fetches URLs the edge cache has never seen — the CDN in
+// front of krefwatch.com caches /data/*.json for a year (2026-09-18 incident:
+// readers saw Sept. 14 races.json under the Sept. 18 prerendered HTML).
+declare const __BUILD_ID__: string;
+const BUILD_ID = typeof __BUILD_ID__ === 'string' ? __BUILD_ID__ : 'dev';
+
 async function fetchJson<T>(path: string): Promise<T> {
-  const res = await fetch(path);
+  const res = await fetch(`${path}${path.includes('?') ? '&' : '?'}v=${BUILD_ID}`);
   if (!res.ok) {
     throw new Error(`Request failed (${res.status}) loading ${path}`);
   }
